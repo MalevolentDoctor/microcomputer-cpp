@@ -1,34 +1,24 @@
-#include <iostream>
-#include <SDL2/SDL.h>
+#include "core.hpp"
 
-const int WIDTH = 800, HEIGHT = 600;
+#include <iostream>
+
+Core *core = nullptr;
 
 int main(int argc, char *argv[]) {
 
-	SDL_Init(SDL_INIT_EVERYTHING);
+	std::cout << "Hello there" << std::endl;
 
-	SDL_Window *window = SDL_CreateWindow("Hello There", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT, SDL_WINDOW_ALLOW_HIGHDPI);
+	core = new Core();
+	core->init("Test Window", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720);
 
-
-	if (NULL == window) {
-		std::cout << "Could not create window: " << SDL_GetError() << std::endl;
-		return 1;
+	while (core->running()) {
+		
+		core->event();
+		core->update();
+		core->draw();
 	}
 
-	SDL_Event windowEvent;
+	core->clean();
 
-	while (true) {
-
-		if (SDL_PollEvent(&windowEvent)) {
-			if (SDL_QUIT == windowEvent.type) {
-				break;
-			}
-		}
-
-	}
-
-	SDL_DestroyWindow(window);
-	SDL_Quit();
-
-	return EXIT_SUCCESS;
+	return 0;
 }
