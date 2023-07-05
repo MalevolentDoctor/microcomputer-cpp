@@ -1,8 +1,7 @@
 #ifndef TEXTUREMANAGER_HPP
 #define TEXTUREMANAGER_HPP
 
-#include "SDL2/SDL.h"
-#include "SDL2/SDL_image.h"
+#include "core.hpp"
 
 class TextureManager {
 	public:
