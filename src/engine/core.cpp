@@ -1,4 +1,11 @@
 #include "core.hpp"
+#include "texturemanager.hpp"
+
+SDL_Texture* test_tex;
+SDL_Rect src_rect, dest_rect;
+SDL_Renderer* Core::renderer = nullptr;
+
+double cnt = 0;
 
 Core::Core() {
 }
@@ -30,8 +37,9 @@ void Core::init(const char* title, int xpos, int ypos, int width, int height) {
 	} else {
 		SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255);
 		std::cout << "Renderer created successfully" << std::endl;
-		return;
 	}
+
+	test_tex = TextureManager::loadTexture("assets/spr_test_sprite.png");
 
 	is_running = true;
 
@@ -51,12 +59,22 @@ void Core::event() {
 	}
 }
 
-void Core::update() {
+void Core::update(double delta) {
+	//delta is the time in milliseconds
+	cnt = cnt + 30*delta/1000;
+
+	dest_rect.w = 64;
+	dest_rect.h = 64;
+	
+	dest_rect.x = cnt;
+	dest_rect.y = cnt;
 }
 
 void Core::draw() {
 	SDL_RenderClear(renderer);
-	//add things to draw
+	
+	SDL_RenderCopy(renderer, test_tex, NULL, &dest_rect);
+
 	SDL_RenderPresent(renderer);
 }
 
