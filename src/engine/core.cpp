@@ -1,11 +1,9 @@
 #include "core.hpp"
 #include "texturemanager.hpp"
+#include "object2d.hpp"
 
-SDL_Texture* test_tex;
-SDL_Rect src_rect, dest_rect;
 SDL_Renderer* Core::renderer = nullptr;
-
-double cnt = 0;
+Object2D* square;
 
 Core::Core() {
 }
@@ -39,7 +37,7 @@ void Core::init(const char* title, int xpos, int ypos, int width, int height) {
 		std::cout << "Renderer created successfully" << std::endl;
 	}
 
-	test_tex = TextureManager::loadTexture("assets/spr_test_sprite.png");
+	square = new Object2D("assets/spr_test_sprite.png", 50, 50);
 
 	is_running = true;
 
@@ -61,26 +59,20 @@ void Core::event() {
 
 void Core::update(double delta) {
 	//delta is the time in milliseconds
-	cnt = cnt + 30*delta/1000;
-
-	dest_rect.w = 64;
-	dest_rect.h = 64;
-	
-	dest_rect.x = cnt;
-	dest_rect.y = cnt;
+	square->update(delta);
 }
 
 void Core::draw() {
-	SDL_RenderClear(renderer);
+	SDL_RenderClear(Core::renderer);
 	
-	SDL_RenderCopy(renderer, test_tex, NULL, &dest_rect);
+	square->draw();
 
-	SDL_RenderPresent(renderer);
+	SDL_RenderPresent(Core::renderer);
 }
 
 void Core::clean() {
 	SDL_DestroyWindow(window);
-	SDL_DestroyRenderer(renderer);
+	SDL_DestroyRenderer(Core::renderer);
 	SDL_Quit();
 }
 
