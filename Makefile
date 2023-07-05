@@ -1,2 +1,9 @@
+CC = g++
+CFLAGS = -Wall -Isrc\include -Isrc\engine -Lsrc\lib
+LDFLAGS = -lmingw32 -lSDL2main -lSDL2 -lSDL2_image
+CPPFILES = src/engine/texturemanager.cpp src/engine/core.cpp main.cpp
+OBJFILES = texturemanager.o core.o main.o
+TARGET = main
+
 all:
-	g++ -Isrc/include -Iengine -L src/lib -o main main.cpp engine/core.cpp -lmingw32 -lSDL2main -lSDL2
+	$(CC) $(CFLAGS) -o $(TARGET) $(CPPFILES) $(LDFLAGS)
