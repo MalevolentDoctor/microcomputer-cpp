@@ -73,6 +73,7 @@ void Core::beginUpdate() {
 void Core::update(double delta) {
 	//delta is the time in milliseconds
 	square->update(delta);
+	Keyboard::update(delta);
 	
 }
 

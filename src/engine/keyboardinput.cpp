@@ -4,6 +4,11 @@
 bool Keyboard::kmod_ctrl, Keyboard::kmod_shift, Keyboard::kmod_alt, Keyboard::kmod_caps;
 std::map<SDL_Keycode, keyState> Keyboard::key_map;
 
+int Keyboard::keys_pressed = 0;
+int Keyboard::keys_released = 0;
+SDL_Keycode Keyboard::pressed_key_array[max_rollover];
+SDL_Keycode Keyboard::released_key_array[max_rollover];
+
 void Keyboard::init() {
 	key_map[SDLK_0] = {0, 0, 0, "0", ")"};
 	key_map[SDLK_1] = {0, 0, 0, "1", "!"};
@@ -113,44 +118,33 @@ void Keyboard::init() {
 	key_map[SDLK_POWER] = {0, 0, 0, "", ""};
 	key_map[SDLK_UNKNOWN] = {0, 0, 0, "", ""};
 	
-	for (auto const& [key, val] : key_map) {
-		if (key >= 0x40000068) {
-			std::cout << key << " : " << val.key_val << std::endl;
-		}
-	}
-	
 	kmod_ctrl = false;
 	kmod_shift = false;
 	kmod_alt = false;
 	kmod_caps = false;
 }
 
+void Keyboard::update(double delta) {
+	//debug
+	std::string disp = Keyboard::getCharString();
+	if (disp.length() > 0) {
+		std::cout << disp << std::endl;
+	}
+}
+
 void Keyboard::endUpdate() {
-	//std::cout << kmod_shift << std::endl;
-	for (auto const& [key, val] : key_map) {
-		//debug
+	SDL_Keycode keycode;
 
-		if (val.pressed) {
+	for (int i = 0; i < keys_pressed; i++) {
+		keycode = pressed_key_array[i];
+		key_map[keycode].pressed = false;
+		keys_pressed = 0;
+	}
 
-			//alphabet keys
-			if ((0x60 < key) && (key < 0x7B)) {
-				if (kmod_shift ^ kmod_caps) {
-					std::cout << "Key: " << val.shift_key_val << " Keycode: " << key << std::endl;
-				} else {
-					std::cout << "Key: " << val.key_val << " Keycode: " << key << std::endl;
-				}
-			} else {
-
-				if (kmod_shift) {
-					std::cout << "Key: " << val.shift_key_val << " Keycode: " << key << std::endl;
-				} else {
-					std::cout << "Key: " << val.key_val << " Keycode: " << key << std::endl;
-				}
-			}
-		}
-
-		key_map[key].pressed = false;
-		key_map[key].released = false;
+	for (int i = 0; i < keys_released; i++) {
+		keycode = released_key_array[i];
+		key_map[keycode].released = false;
+		keys_released = 0;
 	}
 }
 
@@ -166,17 +160,51 @@ bool Keyboard::isKeyReleased(SDL_Keycode keycode) {
 	return key_map[keycode].released;
 }
 
-void Keyboard::handleKeys(SDL_KeyboardEvent* key_event) {
-	bool pressed, repeat;
+std::string Keyboard::getCharString()
+{
+	SDL_Keycode keycode;
+	keyState keystate;
+	std::string str_out = "";
+
+	for (int i = 0; i < keys_pressed; i++) {
+		keycode = pressed_key_array[i];
+		keystate = key_map[keycode];
+
+		if ((0x60 < keycode) && (keycode < 0x7B)) {
+			str_out += (kmod_shift ^ kmod_caps) ? keystate.shift_key_val : keystate.key_val;
+		} else {
+			str_out += (kmod_shift) ? keystate.shift_key_val : keystate.key_val;
+		}
+	}
+	return str_out;
+}
+
+void Keyboard::handleKeys(SDL_KeyboardEvent *key_event)
+{
+	bool pressed;
 	int keycode = key_event->keysym.sym;
+	
 
 	if (keycode < 0x40000068) { 
 		pressed = (key_event->state == SDL_PRESSED);
-		repeat = (key_event->repeat != 0);
 
-		key_map[keycode].pressed = (key_map[keycode].pressed) || (pressed && !repeat);
+		key_map[keycode].pressed = (key_map[keycode].pressed) || (pressed);
 		key_map[keycode].released = !pressed;
 		key_map[keycode].held = !(key_map[keycode].held && !pressed) || pressed;
+
+		if (pressed) {
+			if (keys_pressed < max_rollover) {
+				pressed_key_array[keys_pressed++] = keycode;
+			} else {
+				std::cout << "Warning: Rollover limit reached" << std::endl;
+			}
+		} else {
+			if (keys_released < max_rollover) {
+				released_key_array[keys_released++] = keycode;
+			} else {
+				std::cout << "Warning: Rollover limit reached" << std::endl;
+			}
+		}
 	}
 
 	kmod_ctrl = (key_event->keysym.mod & KMOD_CTRL);
