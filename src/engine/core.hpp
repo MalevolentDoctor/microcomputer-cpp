@@ -15,7 +15,9 @@ class Core {
 		void init(const char* title, int xpos, int ypos, int width, int height);
 
 		void event();
+		void beginUpdate();
 		void update(double delta);
+		void endUpdate();
 		void draw();
 		void clean();
 

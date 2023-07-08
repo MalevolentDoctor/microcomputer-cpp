@@ -20,7 +20,9 @@ int main(int argc, char *argv[]) {
 		delta_time = (double)((time_now - time_last) * 1000 / (double)SDL_GetPerformanceFrequency());
 		
 		core->event();
+		core->beginUpdate();
 		core->update(delta_time);
+		core->endUpdate();
 		core->draw();
 	}
 
