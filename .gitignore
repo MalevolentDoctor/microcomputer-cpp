@@ -1,2 +1,4 @@
 .vscode
 *.exe
+*.m
+temp.txt
