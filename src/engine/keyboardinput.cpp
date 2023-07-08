@@ -10,6 +10,7 @@ SDL_Keycode Keyboard::pressed_key_array[max_rollover];
 SDL_Keycode Keyboard::released_key_array[max_rollover];
 
 void Keyboard::init() {
+	//populate key_map values
 	key_map[SDLK_0] = {0, 0, 0, "0", ")"};
 	key_map[SDLK_1] = {0, 0, 0, "1", "!"};
 	key_map[SDLK_2] = {0, 0, 0, "2", "@"};
@@ -118,6 +119,7 @@ void Keyboard::init() {
 	key_map[SDLK_POWER] = {0, 0, 0, "", ""};
 	key_map[SDLK_UNKNOWN] = {0, 0, 0, "", ""};
 	
+	//initialise modifier keys
 	kmod_ctrl = false;
 	kmod_shift = false;
 	kmod_alt = false;
@@ -135,12 +137,14 @@ void Keyboard::update(double delta) {
 void Keyboard::endUpdate() {
 	SDL_Keycode keycode;
 
+	//reset pressed keys
 	for (int i = 0; i < keys_pressed; i++) {
 		keycode = pressed_key_array[i];
 		key_map[keycode].pressed = false;
 		keys_pressed = 0;
 	}
 
+	//reset released keys
 	for (int i = 0; i < keys_released; i++) {
 		keycode = released_key_array[i];
 		key_map[keycode].released = false;
@@ -166,13 +170,14 @@ std::string Keyboard::getCharString()
 	keyState keystate;
 	std::string str_out = "";
 
+	//loop thorugh the keys pressed 
 	for (int i = 0; i < keys_pressed; i++) {
 		keycode = pressed_key_array[i];
 		keystate = key_map[keycode];
 
-		if ((0x60 < keycode) && (keycode < 0x7B)) {
+		if ((0x60 < keycode) && (keycode < 0x7B)) { // for alphabet keys
 			str_out += (kmod_shift ^ kmod_caps) ? keystate.shift_key_val : keystate.key_val;
-		} else {
+		} else { // for other keys
 			str_out += (kmod_shift) ? keystate.shift_key_val : keystate.key_val;
 		}
 	}
@@ -184,21 +189,25 @@ void Keyboard::handleKeys(SDL_KeyboardEvent *key_event)
 	bool pressed;
 	int keycode = key_event->keysym.sym;
 	
-
+	// for the relavent keys
 	if (keycode < 0x40000068) { 
+		//check if the key has been pressed (true) or released (false)
 		pressed = (key_event->state == SDL_PRESSED);
 
+		//set the state of the key in the 
 		key_map[keycode].pressed = (key_map[keycode].pressed) || (pressed);
 		key_map[keycode].released = !pressed;
 		key_map[keycode].held = !(key_map[keycode].held && !pressed) || pressed;
 
 		if (pressed) {
+			//save pressed keys to the pressed_key_array
 			if (keys_pressed < max_rollover) {
 				pressed_key_array[keys_pressed++] = keycode;
 			} else {
 				std::cout << "Warning: Rollover limit reached" << std::endl;
 			}
 		} else {
+			//save released keys to the released_key_array
 			if (keys_released < max_rollover) {
 				released_key_array[keys_released++] = keycode;
 			} else {
@@ -207,6 +216,7 @@ void Keyboard::handleKeys(SDL_KeyboardEvent *key_event)
 		}
 	}
 
+	//set modifier key flags
 	kmod_ctrl = (key_event->keysym.mod & KMOD_CTRL);
 	kmod_shift = (key_event->keysym.mod & KMOD_SHIFT);
 	kmod_alt = (key_event->keysym.mod & KMOD_ALT);
