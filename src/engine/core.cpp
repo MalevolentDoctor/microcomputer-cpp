@@ -1,6 +1,7 @@
 #include "core.hpp"
 #include "texturemanager.hpp"
 #include "object2d.hpp"
+#include "keyboardinput.hpp"
 
 SDL_Renderer* Core::renderer = nullptr;
 Object2D* square;
@@ -37,6 +38,8 @@ void Core::init(const char* title, int xpos, int ypos, int width, int height) {
 		std::cout << "Renderer created successfully" << std::endl;
 	}
 
+	Keyboard::init();
+
 	square = new Object2D("assets/spr_test_sprite.png", 50, 50);
 
 	is_running = true;
@@ -45,21 +48,36 @@ void Core::init(const char* title, int xpos, int ypos, int width, int height) {
 
 void Core::event() {
 	SDL_Event event;
-	SDL_PollEvent(&event);
 
-	switch (event.type) {
-		case SDL_QUIT:
-			is_running = false;
-			break;
+	while(SDL_PollEvent(&event)) {
+		switch (event.type) {
+			case SDL_QUIT:
+				is_running = false;
+				break;
 
-		default:
-			break;
+			case SDL_KEYDOWN:
+			case SDL_KEYUP:
+				Keyboard::handleKeys(&event.key);
+				break;
+
+			default:
+				break;
+		}
 	}
+}
+
+void Core::beginUpdate() {
+
 }
 
 void Core::update(double delta) {
 	//delta is the time in milliseconds
 	square->update(delta);
+	
+}
+
+void Core::endUpdate() {
+	Keyboard::endUpdate();
 }
 
 void Core::draw() {
