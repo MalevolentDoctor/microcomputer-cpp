@@ -2,6 +2,7 @@
 #include "texturemanager.hpp"
 #include "object2d.hpp"
 #include "keyboardinput.hpp"
+#include "sprite.hpp"
 
 SDL_Renderer* Core::renderer = nullptr;
 Object2D* square;
