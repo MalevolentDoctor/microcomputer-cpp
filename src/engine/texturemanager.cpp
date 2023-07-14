@@ -7,3 +7,9 @@ SDL_Texture* TextureManager::loadTexture(const char* file_name) {
 
 	return texture;
 }
+
+SDL_Point TextureManager::getTextureSize(SDL_Texture *texture) {
+	SDL_Point texture_size;
+	SDL_QueryTexture(texture, NULL, NULL, &(texture_size.x), &(texture_size.y));
+	return texture_size;
+}
