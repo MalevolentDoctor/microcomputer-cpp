@@ -5,7 +5,8 @@
 #include "sprite.hpp"
 
 SDL_Renderer* Core::renderer = nullptr;
-Object2D* square;
+Object2D* obj2d_square;
+Sprite* spr_square;
 
 Core::Core() {
 }
@@ -41,7 +42,8 @@ void Core::init(const char* title, int xpos, int ypos, int width, int height) {
 
 	Keyboard::init();
 
-	square = new Object2D("assets/spr_test_sprite.png", 50, 50);
+	spr_square = new Sprite("assets/spr_test_sprite.png", 50, 40);
+	obj2d_square = new Object2D(spr_square);
 
 	is_running = true;
 
@@ -73,7 +75,7 @@ void Core::beginUpdate() {
 
 void Core::update(double delta) {
 	//delta is the time in milliseconds
-	square->update(delta);
+	obj2d_square->update(delta);
 	Keyboard::update(delta);
 	
 }
@@ -85,7 +87,7 @@ void Core::endUpdate() {
 void Core::draw() {
 	SDL_RenderClear(Core::renderer);
 	
-	square->draw();
+	obj2d_square->draw();
 
 	SDL_RenderPresent(Core::renderer);
 }
