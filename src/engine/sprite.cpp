@@ -8,21 +8,22 @@ Sprite::Sprite(const char* texture_file, int _x, int _y, double _xscale, double 
 	sprite_texture_size = TextureManager::getTextureSize(sprite_texture);
 
 	//set x/y part to be the texture w/h if none is specified
-	if (_xpart == -1) { _xpart = sprite_texture_size.x; }
-	if (_ypart == -1) { _ypart = sprite_texture_size.y; }
+	wpart = (_wpart == -1) ? sprite_texture_size.x : _wpart;
+	hpart = (_hpart == -1) ? sprite_texture_size.y : _hpart;
 
 	setPosition(_x, _y);
+	setScale(_xscale, _yscale);
 
 	//need to check what the float is doing here
-	dest_rect.w = _wpart * _xscale;
-	dest_rect.h = _hpart * _yscale;
+	dest_rect.w = wpart * xscale;
+	dest_rect.h = hpart * yscale;
 
 	orientation = _orientation;
 
-	centre.x = _wpart/2;
-	centre.y = _hpart/2;
+	centre.x = wpart/2;
+	centre.y = hpart/2;
 
-	setPart(_xpart, _ypart, _wpart, _hpart);
+	setPart(_xpart, _ypart, wpart, hpart);
 }
 
 void Sprite::draw() {
